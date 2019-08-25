@@ -1,33 +1,43 @@
-import React from 'react';
-import {Grid} from '@material-ui/core';
-import {SearchBar,VideoList, VideoDetail} from './components';
+import React, { useState } from "react";
+import { Grid } from "@material-ui/core";
 
-// import youtube from './api/youtube';
+import { SearchBar, VideoList, VideoDetail } from "./components";
 
+import youtube from "./api/youtube";
 
-class App extends React.Component{
-    render() {
-        return (
-            <Grid justify="center" container spacing={10}>
-                <Grid item xs={12}>
-                    <Grid container spacing={10}>
-                        <Grid item xs={12}>
-                            <SearchBar onFormSubmit={this.handleSubmit}/>
+export default () => {
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-                        </Grid>
-                        <Grid item xs={8}>
-                            <VideoDetail/>
+  return (
+    <Grid style={{ justifyContent: "center" }} container spacing={10}>
+      <Grid item xs={11}>
+        <Grid container spacing={10}>
+          <Grid item xs={12}>
+            <SearchBar onSubmit={handleSubmit} />
+          </Grid>
+          <Grid item xs={8}>
+            <VideoDetail video={selectedVideo} />
+          </Grid>
+          <Grid item xs={4}>
+            <VideoList videos={videos} onVideoSelect={setSelectedVideo} />
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
 
-                        </Grid>
-                        <Grid item xs={4}>
-                            <VideoList/>
+  async function handleSubmit(searchTerm) {
+    const { data: { items: videos } } = await youtube.get("search", {
+      params: {
+        part: "snippet",
+        maxResults: 5,
+        key: 'AIzaSyDrxZJq-Y1nhn-nWXK9lcQyezZpN7fgfS4',
+        q: searchTerm,
+      }
+    });
 
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Grid>
-        )
-    }
+    setVideos(videos);
+    setSelectedVideo(videos[0]);
+  }
 }
-
-export default App;
